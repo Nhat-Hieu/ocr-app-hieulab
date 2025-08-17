@@ -1,54 +1,69 @@
 import pytesseract
+import streamlit as st
+import cv2
+import numpy as np
+from PIL import Image
 
-# Chỉ định đường dẫn Tesseract (Linux trên Streamlit Cloud)
+# Chỉ định đường dẫn Tesseract (Linux/Streamlit Cloud)
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
-import streamlit as st
-import cv2
-import numpy as np
-import pytesseract
-from PIL import Image
-
+# ==============================
+# 1) Tiêu đề
+# ==============================
 st.title("📝 OCR App (English & Vietnamese)")
 
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
-
-lang = st.selectbox("Select language", ["eng", "vie"])
+uploaded_file = st.file_uploader("📂 Upload an image", type=["jpg", "png", "jpeg"])
+lang = st.selectbox("🌐 Select language", ["eng", "vie"])
 
 if uploaded_file is not None:
     img = Image.open(uploaded_file)
     st.image(img, caption="Uploaded Image", use_column_width=True)
 
-    # Preprocess
+    # ==============================
+    # 2) Xử lý ảnh
+    # ==============================
     img_cv = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     _, bw = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-    # OCR
+    # ==============================
+    # 3) OCR
+    # ==============================
     text = pytesseract.image_to_string(Image.fromarray(bw), lang=lang)
-    st.text_area("OCR Result", text, height=300)
+    st.text_area("📖 OCR Result", text, height=300)
 
-import streamlit as st
-import cv2
-import numpy as np
-import pytesseract
-from PIL import Image
+    # ==============================
+    # 4) Nút Copy & Download
+    # ==============================
+    # Copy vào Clipboard
+    copy_code = f"""
+    <script>
+    function copyToClipboard() {{
+        navigator.clipboard.writeText(`{text}`);
+        alert("✅ OCR result copied to clipboard!");
+    }}
+    </script>
+    <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+    """
+    st.markdown(copy_code, unsafe_allow_html=True)
 
-st.title("📝 OCR App (English & Vietnamese)")
+    # Download file .txt
+    st.download_button(
+        label="💾 Download OCR Result",
+        data=text,
+        file_name="ocr_result.txt",
+        mime="text/plain"
+    )
 
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
-
-lang = st.selectbox("Select language", ["eng", "vie"])
-
-if uploaded_file is not None:
-    img = Image.open(uploaded_file)
-    st.image(img, caption="Uploaded Image", use_column_width=True)
-
-    # Preprocess
-    img_cv = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-    gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    _, bw = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-    # OCR
-    text = pytesseract.image_to_string(Image.fromarray(bw), lang=lang)
-    st.text_area("OCR Result", text, height=300)
+# ==============================
+# 5) Footer
+# ==============================
+st.markdown(
+    """
+    <hr>
+    <div style="text-align:center; color:gray; font-size:14px;">
+        Developed by <b>Hồ Tăng Nhật Hiếu</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
