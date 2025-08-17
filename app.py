@@ -3,6 +3,7 @@ import streamlit as st
 import cv2
 import numpy as np
 from PIL import Image
+import streamlit.components.v1 as components
 
 # Path to Tesseract (Linux/Streamlit Cloud)
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
@@ -39,13 +40,17 @@ if uploaded_file is not None and lang != "-- Select language --":
         # ==============================
         # 4) Buttons (Copy & Download)
         # ==============================
-        # Fake "Copy" button (same style as Download)
-        st.download_button(
-            label="📋 Copy to Clipboard",
-            data=text,
-            file_name="copy.txt",   # user can open/copy
-            mime="text/plain"
-        )
+        # Real Copy button (via custom HTML)
+        copy_btn = f"""
+            <button onclick="navigator.clipboard.writeText(`{text}`); 
+                             alert('✅ Copied to clipboard!');"
+                    style="padding:8px 16px; font-size:16px; border:none;
+                           border-radius:6px; background-color:#4CAF50;
+                           color:white; cursor:pointer;">
+                📋 Copy to Clipboard
+            </button>
+        """
+        components.html(copy_btn, height=60)
 
         # Real Download button
         st.download_button(
