@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import streamlit.components.v1 as components
+import uuid
 
 # Path to Tesseract (Linux/Streamlit Cloud)
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
@@ -40,19 +41,22 @@ if uploaded_file is not None and lang != "-- Select language --":
         # ==============================
         # 4) Buttons (Copy & Download)
         # ==============================
-        # Real Copy button (via custom HTML)
+        msg_id = f"msg-{uuid.uuid4()}"
         copy_btn = f"""
-            <button onclick="navigator.clipboard.writeText(`{text}`); 
-                             alert('✅ Copied to clipboard!');"
+            <button onclick="navigator.clipboard.writeText(`{text}`);
+                             var el = document.getElementById('{msg_id}');
+                             el.style.display='block';"
                     style="padding:8px 16px; font-size:16px; border:none;
                            border-radius:6px; background-color:#4CAF50;
                            color:white; cursor:pointer;">
                 📋 Copy to Clipboard
             </button>
+            <p id="{msg_id}" style="display:none; color:green; margin-top:10px;">
+                ✅ Copied to clipboard!
+            </p>
         """
-        components.html(copy_btn, height=60)
+        components.html(copy_btn, height=80)
 
-        # Real Download button
         st.download_button(
             label="💾 Download OCR Result",
             data=text,
