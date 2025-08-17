@@ -13,7 +13,7 @@ pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 # ==============================
 # 1) Title
 # ==============================
-st.title("📝 OCR App")
+st.title("📝 OCR App (English & Vietnamese)")
 
 uploaded_file = st.file_uploader("📂 Upload an image", type=["jpg", "png", "jpeg"])
 
