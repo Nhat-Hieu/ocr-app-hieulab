@@ -3,7 +3,6 @@ import streamlit as st
 import cv2
 import numpy as np
 from PIL import Image
-from streamlit_clipboard import st_clipboard
 
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
@@ -39,8 +38,14 @@ if uploaded_file is not None:
         # ==============================
         # 4) Nút Copy & Download
         # ==============================
-        # Copy vào Clipboard (dùng streamlit-clipboard)
-        st_clipboard(text, "📋 Copy to Clipboard")
+        # Copy vào Clipboard bằng JavaScript
+        copy_code = f"""
+            <textarea id="ocr_text" style="display:none;">{text}</textarea>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('ocr_text').value); alert('✅ OCR result copied!');">
+                📋 Copy to Clipboard
+            </button>
+        """
+        st.markdown(copy_code, unsafe_allow_html=True)
 
         # Download file .txt
         st.download_button(
