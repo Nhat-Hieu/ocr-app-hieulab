@@ -38,14 +38,16 @@ if uploaded_file is not None:
         # ==============================
         # 4) Nút Copy & Download
         # ==============================
-        # Copy vào Clipboard bằng JavaScript
+        # Copy vào Clipboard bằng JavaScript (render nút thật sự)
         copy_code = f"""
             <textarea id="ocr_text" style="display:none;">{text}</textarea>
-            <button onclick="navigator.clipboard.writeText(document.getElementById('ocr_text').value); alert('✅ OCR result copied!');">
+            <button style="padding:8px 16px; font-size:16px; border:none; border-radius:6px; background-color:#4CAF50; color:white; cursor:pointer;"
+                onclick="navigator.clipboard.writeText(document.getElementById('ocr_text').value); alert('✅ OCR result copied!');">
                 📋 Copy to Clipboard
             </button>
         """
         st.markdown(copy_code, unsafe_allow_html=True)
+
 
         # Download file .txt
         st.download_button(
