@@ -3,8 +3,8 @@ import streamlit as st
 import cv2
 import numpy as np
 from PIL import Image
+from streamlit_clipboard import st_clipboard
 
-# Chỉ định đường dẫn Tesseract (Linux/Streamlit Cloud)
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
 # ==============================
@@ -13,11 +13,11 @@ pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 st.title("📝 OCR App (English & Vietnamese)")
 
 uploaded_file = st.file_uploader("📂 Upload an image", type=["jpg", "png", "jpeg"])
-lang = st.selectbox("🌐 Select language", ["eng", "vie"])
+lang = st.selectbox("🌐 Select language", ["eng", "vie", "eng+vie"])
 
 if uploaded_file is not None:
     img = Image.open(uploaded_file)
-    st.image(img, caption="Uploaded Image", use_column_width=True)
+    st.image(img, caption="Uploaded Image", use_container_width=True)
 
     # ==============================
     # 2) Xử lý ảnh
@@ -30,30 +30,25 @@ if uploaded_file is not None:
     # 3) OCR
     # ==============================
     text = pytesseract.image_to_string(Image.fromarray(bw), lang=lang)
-    st.text_area("📖 OCR Result", text, height=300)
 
-    # ==============================
-    # 4) Nút Copy & Download
-    # ==============================
-    # Copy vào Clipboard
-    copy_code = f"""
-    <script>
-    function copyToClipboard() {{
-        navigator.clipboard.writeText(`{text}`);
-        alert("✅ OCR result copied to clipboard!");
-    }}
-    </script>
-    <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
-    """
-    st.markdown(copy_code, unsafe_allow_html=True)
+    if not text.strip():
+        st.warning("⚠️ Không nhận diện được văn bản trong ảnh.")
+    else:
+        st.text_area("📖 OCR Result", text, height=300)
 
-    # Download file .txt
-    st.download_button(
-        label="💾 Download OCR Result",
-        data=text,
-        file_name="ocr_result.txt",
-        mime="text/plain"
-    )
+        # ==============================
+        # 4) Nút Copy & Download
+        # ==============================
+        # Copy vào Clipboard (dùng streamlit-clipboard)
+        st_clipboard(text, "📋 Copy to Clipboard")
+
+        # Download file .txt
+        st.download_button(
+            label="💾 Download OCR Result",
+            data=text,
+            file_name="ocr_result.txt",
+            mime="text/plain"
+        )
 
 # ==============================
 # 5) Footer
