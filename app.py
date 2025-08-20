@@ -6,9 +6,14 @@ from PIL import Image
 import streamlit.components.v1 as components
 import uuid
 from streamlit_cropper import st_cropper
+import platform  # 👈 thêm
 
-# Path to Tesseract (Linux/Streamlit Cloud)
-pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+# Path to Tesseract (Windows / Linux / Streamlit Cloud)
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+else:
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+
 
 # ==============================
 # 1) Title
